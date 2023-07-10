@@ -13,7 +13,11 @@ import java.util.List;
  * @author Gilles Foster Djoko Kamgaing , Hassan Khanafer, Andy Mahautiere
  ***********************************************************************************************/
 
+
 public class GenerateurMouvement {
+
+    public GenerateurMouvement() {
+    }
 
     /**
      * Génère une liste des mouvements légaux pour un état de plateau de jeu et un

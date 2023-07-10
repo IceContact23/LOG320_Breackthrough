@@ -13,22 +13,22 @@ import java.util.Random;
  ***********************************************************************************************/
 public class MinMax {
 
-    private static final int depthMaximum = 4;
+    private static final int depthMaximum = 5;
 
     /**
-     * Applique l'algorithme Minimax avec élagage Alpha-Beta pour évaluer et
-     * sélectionner le meilleur coup.
+     * Applique l'algorithme Minimax avec Ã©lagage Alpha-Beta pour Ã©valuer et
+     * sÃ©lectionner le meilleur coup.
      *
-     * @param tableau            L'état actuel du plateau de jeu.
+     * @param tableau            L'Ã©tat actuel du plateau de jeu.
      * @param depth              La profondeur actuelle de la recherche Minimax.
-     * @param alpha              La valeur alpha pour l'élagage Alpha-Bêta.
-     * @param beta               La valeur bêta pour l'élagage Alpha-Bêta.
+     * @param alpha              La valeur alpha pour l'Ã©lagage Alpha-BÃªta.
+     * @param beta               La valeur bÃªta pour l'Ã©lagage Alpha-BÃªta.
      * @param isMaximizingPlayer Indique si le joueur actuel est le joueur qui maximise ou non.
-     * @param tempsFin           L'horodatage de l'échéance pour arrêter la recherche.
-     * @return                   Le score d'évaluation du mouvement.
+     * @param tempsFin           L'horodatage de l'Ã©chÃ©ance pour arrÃªter la recherche.
+     * @return                   Le score d'Ã©valuation du mouvement.
      */
     public static double AlphaBeta(Tableau tableau, int depth, double alpha, double beta, boolean isMaximizingPlayer,
-            long tempsFin) {
+                                   long tempsFin) {
 
         if (System.currentTimeMillis() >= tempsFin) {
             return 0;
@@ -109,13 +109,13 @@ public class MinMax {
     }
 
     /**
-     * Sélectionne le meilleur coup pour un état de plateau de jeu et un joueur
-     * donnés en utilisant l'algorithme Minimax avec élagage Alpha-Beta et
-     * approfondissement itératif.
+     * SÃ©lectionne le meilleur coup pour un Ã©tat de plateau de jeu et un joueur
+     * donnÃ©s en utilisant l'algorithme Minimax avec Ã©lagage Alpha-Beta et
+     * approfondissement itÃ©ratif.
      *
-     * @param tableau     L'état actuel du plateau de jeu.
+     * @param tableau     L'Ã©tat actuel du plateau de jeu.
      * @param isRedPlayer Indique si le joueur actuel est le joueur rouge ou non.
-     * @return            Le meilleur coup à jouer.
+     * @return            Le meilleur coup Ã  jouer.
      */
     public static Mouvement getBestMove(Tableau tableau, boolean isRedPlayer) {
 

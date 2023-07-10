@@ -11,19 +11,28 @@ package Breakthrough;
 
 public class Evaluation {
 
-    Tableau tableau;
+    int[][] tableau;
+    int rowLenght;
+    int colLenght;
     private int nbPionRouge;
     private int nbPionNoir;
-    private int safetyPionRouge;
-    private int safetyPionNoir;
-    private int pionRougeProteger;
-    private int pionNoirProteger;
+    private int pionRougeOpen;
+    private int pionNoirOpen;
+    private int pionRougeSafe;
+    private int pionNoirSafe;
+    private int pionRougeInDanger;
+    private int pionNoirInDanger;
     private int pionRougeBlock;
     private int pionNoirBlock;
     private int gagneProxiRouge;
     private int gagneProxiNoir;
     private int controleCentreRouge;
     private int controleCentreNoir;
+    private int pionNoir = 2;
+    private int pionRouge = 4;
+    /**
+     * TODO: INVERSER X et Y du tableau
+     * */
 
     /**
      * Construit un objet Evaluation avec le tableau donné.
@@ -31,7 +40,9 @@ public class Evaluation {
      * @param tableau le board de jeu
      */
     public Evaluation(Tableau tableau) {
-        this.tableau = tableau;
+        this.tableau = tableau.getTableau();
+        this.rowLenght = tableau.getTableau().length;
+        this.colLenght = tableau.getTableau()[0].length;
     }
 
     /**
@@ -45,31 +56,33 @@ public class Evaluation {
         double evaluation;
 
         evaluateAvantageMaterial();
-        evaluatePusherSafety();
-        evaluateBlock();
+        evaluatePionOpen();
+        //evaluateBlock();
         evaluateGagneProxi();
         evaluateControleCentre();
-        evaluateProtection();
+        evaluatePionSafe();
 
         // Facteurs de poids d'évaluation
-        int poidProtection = 20;
+        int poidProtection = 50;
+        int poidDanger = 50;
+        int poidPionOpen = 50;
         int poidPionPremiereLigneProteger = 35;
-        int poidBlock = 35;
-        int poidPionPremiereLigneVivant = 500;
-        int poidPionDeuxiemeLigneVivant = 500;
+        //int poidBlock = 35;
+        int poidPionPremiereLigneVivant = 50;
+        int poidPionDeuxiemeLigneVivant = 50;
 
         // Calculer le score d'évaluation
-        if (joueur == 1) {
+        if (joueur == 1) { //Pion rouge
             evaluation = poidPionPremiereLigneVivant * (nbPionRouge - nbPionNoir)
                     + poidPionDeuxiemeLigneVivant * (nbPionRouge - nbPionNoir)
-                    + poidProtection * pionRougeProteger + poidPionPremiereLigneProteger * safetyPionRouge
-                    + poidBlock * pionRougeBlock - poidBlock * pionNoirBlock
+                    + poidProtection * pionRougeSafe /*+ poidDanger * (pionNoirInDanger - pionRougeInDanger)*//*poidPionPremiereLigneProteger * safetyPionRouge*/
+                    //+ poidPionOpen * (pionRougeOpen - pionNoirOpen)
                     + gagneProxiRouge - gagneProxiNoir + controleCentreRouge;
-        } else {
+        } else { //Pion noir
             evaluation = poidPionPremiereLigneVivant * (nbPionNoir - nbPionRouge)
                     + poidPionDeuxiemeLigneVivant * (nbPionNoir - nbPionRouge)
-                    + poidProtection * pionNoirProteger + poidPionPremiereLigneProteger * safetyPionNoir
-                    + poidBlock * pionNoirBlock - poidProtection * pionRougeBlock
+                    + poidProtection * pionNoirSafe /*+ poidDanger * (pionRougeInDanger - pionNoirInDanger)*//*poidPionPremiereLigneProteger * safetyPionNoir*/
+                    //+ poidPionOpen * (pionNoirOpen - pionRougeOpen)
                     + gagneProxiNoir - gagneProxiRouge + controleCentreNoir;
         }
 
@@ -88,25 +101,25 @@ public class Evaluation {
         int pionNoirPremiereLigne = 0;
 
         // Compte le nombre de pièces de la première rangée pour chaque joueur
-        for (int row = 0; row < tableau.getTableau().length; row++) {
-            for (int col = 0; col < tableau.getTableau()[row].length; col++) {
+        for (int row = 0; row < tableau.length; row++) {
+            for (int col = 0; col < tableau[row].length; col++) {
 
-                if (tableau.getTableau()[row][col] == 4)
+                if (tableau[row][col] == 4)
                     pionRougePremiereLigne++;
 
-                if (tableau.getTableau()[row][col] == 2)
+                if (tableau[row][col] == 2)
                     pionNoirPremiereLigne++;
 
                 // Vérifiez si les pièces du joueur ont atteint la première rangée de
                 // l'adversaire
                 if (joueur == 1) {
-                    if (tableau.getTableau()[row][col] == 4 || tableau.getTableau()[row][col] == 4) {
+                    if (tableau[row][col] == 4 || tableau[row][col] == 4) {
                         if (col == 0) {
                             return true;
                         }
                     }
                 } else {
-                    if (tableau.getTableau()[row][col] == 2 || tableau.getTableau()[row][col] == 2) {
+                    if (tableau[row][col] == 2 || tableau[row][col] == 2) {
                         if (col == 7) {
                             return true;
                         }
@@ -126,32 +139,36 @@ public class Evaluation {
         nbPionRouge = 0;
         nbPionNoir = 0;
 
-        for (int i = 0; i < tableau.getTableau().length; i++) {
-            for (int j = 0; j < tableau.getTableau()[i].length; j++) {
-                if (tableau.getTableau()[i][j] == 4)
+        for (int i = 0; i < tableau.length; i++) {
+            for (int j = 0; j < tableau[i].length; j++) {
+                if (tableau[i][j] == 4)
                     nbPionRouge++;
 
-                if (tableau.getTableau()[i][j] == 2)
+                if (tableau[i][j] == 2)
                     nbPionNoir++;
             }
         }
     }
 
     /**
-     * Calcule le nombre de pièces rouges et noires protégées sur le plateau de jeu.
+     * Calcule le nombre de pièces rouges et noires protégées et ceux en danger sur le plateau de jeu.
      */
-    private void evaluateProtection() {
-        pionRougeProteger = 0;
-        pionNoirProteger = 0;
+    private void evaluatePionSafe() {
+        pionRougeSafe = nbPionRouge;
+        pionNoirSafe = nbPionNoir;
+        pionRougeInDanger = 0;
+        pionNoirInDanger = 0;
+        for (int i = 0; i < tableau.length; i++) {
+            for (int j = 0; j < tableau[i].length; j++) {
+                if (tableau[i][j] == pionNoir && i+1 <= rowLenght-1 && ((j+1 <= colLenght-1  && tableau[i+1][j+1] == pionRouge) || (j-1 >= 0 && tableau[i+1][j-1] == pionRouge))){
+                    pionNoirSafe--;
+                    pionNoirInDanger++;
+                }
 
-        for (int i = 0; i < tableau.getTableau().length; i++) {
-            for (int j = 0; j < tableau.getTableau()[i].length; j++) {
-                if (tableau.getTableau()[i][j] == 4 && (i == 0 || tableau.getTableau()[i - 1][j] == 4))
-                    pionRougeProteger++;
-
-                if (tableau.getTableau()[i][j] == 2
-                        && (i == tableau.getTableau().length - 1 || tableau.getTableau()[i + 1][j] == 2))
-                    pionNoirProteger++;
+                if (tableau[i][j] == pionRouge && i-1 >= 0 && ((j+1 <= colLenght-1 && tableau[i-1][j+1] == pionNoir)  || (j-1 >= 0 && tableau[i-1][j-1] == pionNoir))){
+                    pionRougeSafe--;
+                    pionRougeInDanger++;
+                }
             }
         }
     }
@@ -159,18 +176,49 @@ public class Evaluation {
     /**
      * Calcule la sécurité des poussoirs rouges et noirs sur le plateau de jeu.
      */
-    private void evaluatePusherSafety() {
-        safetyPionRouge = 0;
-        safetyPionNoir = 0;
+    private void evaluatePionOpen() {
+        pionRougeOpen = 0;
+        pionNoirOpen = 0;
 
-        for (int i = 0; i < tableau.getTableau().length; i++) {
-            for (int j = 0; j < tableau.getTableau()[i].length; j++) {
-                if (tableau.getTableau()[i][j] == 3 && (i == 0 || tableau.getTableau()[i - 1][j] != 4))
-                    safetyPionRouge++;
+        //Pion rouge
+        for (int i = 2; i <= 4; i++) {
+            for (int j = 0; j < tableau[i].length; j++) {
+                if(tableau[i][j] == pionRouge){
+                    pionRougeOpen++;
+                    boolean safe = true;
 
-                if (tableau.getTableau()[i][j] == 1
-                        && (i == tableau.getTableau().length - 1 || tableau.getTableau()[i + 1][j] != 2))
-                    safetyPionNoir++;
+                    if (i-1 >= 0 && ((j+1 <= colLenght-1 && tableau[i-1][j+1] == pionNoir)  || (j-1 >= 0 && tableau[i-1][j-1] == pionNoir))){
+                        pionRougeOpen--;
+                        safe = false;
+                    }
+                    for(int saut = i-2; saut >= 0 && safe; saut= saut-2){
+                        if(saut-1 >= 0 && (tableau[saut-1][j] == pionNoir || (j+1 <= colLenght-1 && tableau[saut-1][j+1] == pionNoir)  || (j-1 >= 0 && tableau[saut-1][j-1] == pionNoir))){
+                            pionRougeOpen--;
+                            safe = false;
+                        }
+                    }
+                }
+            }
+        }
+
+        //Pion noir
+        for (int i = 3; i <= 5; i++) {
+            for (int j = 0; j < tableau[i].length; j++) {
+                if(tableau[i][j] == pionNoir){
+                    pionNoirOpen++;
+                    boolean safe = true;
+
+                    if (i+1 <= rowLenght-1 && ((j+1 <= colLenght-1 && tableau[i+1][j+1] == pionRouge)  || (j-1 >= 0 && tableau[i+1][j-1] == pionRouge))){
+                        pionNoirOpen--;
+                        safe = false;
+                    }
+                    for(int saut = i+2; saut <= rowLenght-1 && safe; saut= saut+2){
+                        if(saut+1 <= rowLenght-1 && (tableau[saut+1][j] == pionRouge || (j+1 <= colLenght-1 && tableau[saut+1][j+1] == pionRouge)  || (j-1 >= 0 && tableau[saut+1][j-1] == pionRouge))){
+                            pionNoirOpen--;
+                            safe = false;
+                        }
+                    }
+                }
             }
         }
     }
@@ -182,16 +230,16 @@ public class Evaluation {
         pionRougeBlock = 0;
         pionNoirBlock = 0;
 
-        for (int i = 0; i < tableau.getTableau().length; i++) {
-            for (int j = 0; j < tableau.getTableau()[i].length; j++) {
-                if (tableau.getTableau()[i][j] == 4) {
-                    if (i != 0 && tableau.getTableau()[i - 1][j] != 0 && tableau.getTableau()[i - 1][j] != 4)
+        for (int i = 0; i < tableau.length; i++) {
+            for (int j = 0; j < tableau[i].length; j++) {
+                if (tableau[i][j] == 4) {
+                    if (i != 0 && tableau[i - 1][j] != 0 && tableau[i - 1][j] != 4)
                         pionRougeBlock++;
                 }
 
-                if (tableau.getTableau()[i][j] == 2) {
-                    if (i != tableau.getTableau().length - 1 && tableau.getTableau()[i + 1][j] != 0
-                            && tableau.getTableau()[i + 1][j] != 2)
+                if (tableau[i][j] == 2) {
+                    if (i != tableau.length - 1 && tableau[i + 1][j] != 0
+                            && tableau[i + 1][j] != 2)
                         pionNoirBlock++;
                 }
             }
@@ -205,13 +253,13 @@ public class Evaluation {
         gagneProxiRouge = 0;
         gagneProxiNoir = 0;
 
-        for (int i = 0; i < tableau.getTableau().length; i++) {
-            for (int j = 0; j < tableau.getTableau()[i].length; j++) {
-                if (tableau.getTableau()[i][j] == 4 && (i == 0 || i == 1))
+        for (int i = 0; i < tableau.length; i++) {
+            for (int j = 0; j < tableau[i].length; j++) {
+                if (tableau[i][j] == 4 && (i == 0 || i == 1))
                     gagneProxiRouge++;
 
-                if (tableau.getTableau()[i][j] == 2
-                        && (i == tableau.getTableau().length - 1 || i == tableau.getTableau().length - 2))
+                if (tableau[i][j] == 2
+                        && (i == tableau.length - 1 || i == tableau.length - 2))
                     gagneProxiNoir++;
             }
         }
@@ -226,11 +274,11 @@ public class Evaluation {
         controleCentreNoir = 0;
 
         for (int i = 2; i < 6; i++) {
-            for (int j = 0; j < tableau.getTableau()[i].length; j++) {
-                if (tableau.getTableau()[i][j] == 4)
+            for (int j = 0; j < tableau[i].length; j++) {
+                if (tableau[i][j] == 4)
                     controleCentreRouge++;
 
-                if (tableau.getTableau()[i][j] == 2)
+                if (tableau[i][j] == 2)
                     controleCentreNoir++;
             }
         }
