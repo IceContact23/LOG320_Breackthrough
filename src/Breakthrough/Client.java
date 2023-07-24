@@ -42,7 +42,7 @@ public class Client {
                     boardValues = s.split(" ");
                     int x=0,y=0;
                     for(int i=0; i<boardValues.length;i++){
-                        board[x][y] = Integer.parseInt(boardValues[i]);
+                        board[y][x] = Integer.parseInt(boardValues[i]);
                         x++;
                         if(x == 8){
                             x = 0;
@@ -59,12 +59,9 @@ public class Client {
 
                     System.out.println("***** " + bestMove + " *****");
 
-                    tableau.getTableau()[bestMove.getFrom().getX()][bestMove.getFrom().getY()] = 0;
+                    tableau.getTableau()[bestMove.getFrom().getY()][bestMove.getFrom().getX()] = 0;
                     if (bestMove.getTypePion() == 4) {
-                        tableau.getTableau()[bestMove.getTo().getX()][bestMove.getTo().getY()] = 4;
-                    }
-                    if (bestMove.getTypePion() == 4) {
-                        tableau.getTableau()[bestMove.getTo().getX()][bestMove.getTo().getY()] = 4;
+                        tableau.getTableau()[bestMove.getTo().getY()][bestMove.getTo().getX()] = 4;
                     }
                     String move = bestMove.toString();
 
@@ -86,7 +83,7 @@ public class Client {
                     boardValues = s.split(" ");
                     int x=0,y=0;
                     for(int i=0; i<boardValues.length;i++){
-                        board[x][y] = Integer.parseInt(boardValues[i]);
+                        board[y][x] = Integer.parseInt(boardValues[i]);
                         x++;
                         if(x == 8){
                             x = 0;
@@ -116,23 +113,17 @@ public class Client {
 
                     if (joueur == 1) {
                         Mouvement bestMove = MinMax.getBestMove(tableau, true);
-                        tableau.getTableau()[bestMove.getFrom().getX()][bestMove.getFrom().getY()] = 0;
+                        tableau.getTableau()[bestMove.getFrom().getY()][bestMove.getFrom().getX()] = 0;
                         if (bestMove.getTypePion() == 4) {
-                            tableau.getTableau()[bestMove.getTo().getX()][bestMove.getTo().getY()] = 4;
-                        }
-                        if (bestMove.getTypePion() == 4) {
-                            tableau.getTableau()[bestMove.getTo().getX()][bestMove.getTo().getY()] = 4;
+                            tableau.getTableau()[bestMove.getTo().getY()][bestMove.getTo().getX()] = 4;
                         }
                         move = bestMove.toString();
                     }
                     else {
                         Mouvement bestMove = MinMax.getBestMove(tableau, false);
-                        tableau.getTableau()[bestMove.getFrom().getX()][bestMove.getFrom().getY()] = 0;
+                        tableau.getTableau()[bestMove.getFrom().getY()][bestMove.getFrom().getX()] = 0;
                         if (bestMove.getTypePion() == 2) {
-                            tableau.getTableau()[bestMove.getTo().getX()][bestMove.getTo().getY()] = 2;
-                        }
-                        if (bestMove.getTypePion() == 2) {
-                            tableau.getTableau()[bestMove.getTo().getX()][bestMove.getTo().getY()] = 2;
+                            tableau.getTableau()[bestMove.getTo().getY()][bestMove.getTo().getX()] = 2;
                         }
                         move = bestMove.toString();
 
@@ -153,7 +144,7 @@ public class Client {
                     System.out.println("Current tableau : ");
                     for(int i=0; i<board.length;i++){
                         for (int j=0; j< board.length; j++) {
-                            System.out.print(board[j][i]);
+                            System.out.print(board[i][j]);
                         }
                         System.out.println();
                     }
@@ -162,23 +153,17 @@ public class Client {
 
                     if (joueur == 1){
                         Mouvement bestMove = MinMax.getBestMove(tableau, true);
-                        tableau.getTableau()[bestMove.getFrom().getX()][bestMove.getFrom().getY()] = 0;
+                        tableau.getTableau()[bestMove.getFrom().getY()][bestMove.getFrom().getX()] = 0;
                         if (bestMove.getTypePion() == 4) {
-                            tableau.getTableau()[bestMove.getTo().getX()][bestMove.getTo().getY()] = 4;
-                        }
-                        if (bestMove.getTypePion() == 4) {
-                            tableau.getTableau()[bestMove.getTo().getX()][bestMove.getTo().getY()] = 4;
+                            tableau.getTableau()[bestMove.getTo().getY()][bestMove.getTo().getX()] = 4;
                         }
                         move = bestMove.toString();
                     }
                     else{
                         Mouvement bestMove = MinMax.getBestMove(tableau, false);
-                        tableau.getTableau()[bestMove.getFrom().getX()][bestMove.getFrom().getY()] = 0;
+                        tableau.getTableau()[bestMove.getFrom().getY()][bestMove.getFrom().getX()] = 0;
                         if (bestMove.getTypePion() == 2) {
-                            tableau.getTableau()[bestMove.getTo().getX()][bestMove.getTo().getY()] = 2;
-                        }
-                        if (bestMove.getTypePion() == 2) {
-                            tableau.getTableau()[bestMove.getTo().getX()][bestMove.getTo().getY()] = 2;
+                            tableau.getTableau()[bestMove.getTo().getY()][bestMove.getTo().getX()] = 2;
                         }
                         move = bestMove.toString();
                     }

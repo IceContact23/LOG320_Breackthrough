@@ -49,16 +49,9 @@ public class MinMax {
                 joueurActuel = 1;
         }
 
-        if (fonctionEvaluation.inWinState(joueurActuel)) {
-            if (isMaximizingPlayer) {
-                return 99999.0 / depth;
-            } else {
-                return -99999.0 / depth;
-            }
-        }
-
-        if (depth == depthMaximum) {
-            return fonctionEvaluation.evaluate(joueurActuel);
+        if (depth == depthMaximum || fonctionEvaluation.inTerminalState()) {
+            double score = fonctionEvaluation.evaluate(joueurActuel);
+            return score;
         }
 
         List<Mouvement> mouvementLegal = GenerateurMouvement.generateMouvementLegal(tableau.getTableau(),
