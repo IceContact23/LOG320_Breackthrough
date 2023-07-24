@@ -17,8 +17,8 @@ public class Coordonne {
      * Construit un nouvel objet `Coordonne` avec les indices de ligne et de colonne
      * donnés.
      *
-     * @param x L'index de ligne.
-     * @param y L'indice de colonne.
+     * @param x L'indice de colonne.
+     * @param y L'index de ligne.
      */
     public Coordonne(int x, int y) {
         this.x = x;

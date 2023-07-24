@@ -14,8 +14,8 @@ public class Evaluation {
     int[][] tableau;
     int rowLenght;
     int colLenght;
-    private int nbPionRouge;
-    private int nbPionNoir;
+    private int pionRougeVivant;
+    private int pionNoirVivant;
     private int pionRougeOpen;
     private int pionNoirOpen;
     private int pionRougeSafe;
@@ -28,6 +28,8 @@ public class Evaluation {
     private int gagneProxiNoir;
     private int controleCentreRouge;
     private int controleCentreNoir;
+    private int scoreAvancementRouge;
+    private int scoreAvancementNoir;
     private int pionNoir = 2;
     private int pionRouge = 4;
     /**
@@ -61,91 +63,98 @@ public class Evaluation {
         evaluateGagneProxi();
         evaluateControleCentre();
         evaluatePionSafe();
+        evaluateAvancementPion();
 
         // Facteurs de poids d'évaluation
-        int poidProtection = 50;
-        int poidDanger = 50;
-        int poidPionOpen = 50;
-        int poidPionPremiereLigneProteger = 35;
+        int poidAvancement = 1;
+        int poidPionSafe = 25;
+        int poidPionInDanger = 50;
+        int poidPionOpen = 0;
         //int poidBlock = 35;
-        int poidPionPremiereLigneVivant = 50;
-        int poidPionDeuxiemeLigneVivant = 50;
+        int poidPionVivant = 5;
+        int poidRatioPionVivant = 10;
+        int poidControleCentre = 0;
+        int poidGagneProxi = 10000;
 
         // Calculer le score d'évaluation
         if (joueur == 1) { //Pion rouge
-            evaluation = poidPionPremiereLigneVivant * (nbPionRouge - nbPionNoir)
-                    + poidPionDeuxiemeLigneVivant * (nbPionRouge - nbPionNoir)
-                    + poidProtection * pionRougeSafe /*+ poidDanger * (pionNoirInDanger - pionRougeInDanger)*//*poidPionPremiereLigneProteger * safetyPionRouge*/
-                    //+ poidPionOpen * (pionRougeOpen - pionNoirOpen)
-                    + gagneProxiRouge - gagneProxiNoir + controleCentreRouge;
+            evaluation = poidPionVivant  * pionRougeVivant
+                    + poidRatioPionVivant * (pionRougeVivant - pionNoirVivant)
+                    + poidAvancement * scoreAvancementRouge
+                    + poidPionSafe * pionRougeSafe + poidPionInDanger * pionNoirInDanger
+                    + poidPionOpen * (pionRougeOpen - pionNoirOpen) - poidGagneProxi * gagneProxiNoir;
         } else { //Pion noir
-            evaluation = poidPionPremiereLigneVivant * (nbPionNoir - nbPionRouge)
-                    + poidPionDeuxiemeLigneVivant * (nbPionNoir - nbPionRouge)
-                    + poidProtection * pionNoirSafe /*+ poidDanger * (pionRougeInDanger - pionNoirInDanger)*//*poidPionPremiereLigneProteger * safetyPionNoir*/
-                    //+ poidPionOpen * (pionNoirOpen - pionRougeOpen)
-                    + gagneProxiNoir - gagneProxiRouge + controleCentreNoir;
+            evaluation = poidPionVivant * (pionNoirVivant - pionRougeVivant)
+                    + poidAvancement * scoreAvancementNoir
+                    + poidPionSafe * pionNoirSafe + poidPionInDanger * pionRougeInDanger
+                    + poidPionOpen * (pionNoirOpen - pionRougeOpen) - poidGagneProxi * gagneProxiRouge;
         }
 
         return (joueur == Client.joueur) ? evaluation : -(evaluation);
     }
 
-    /**
-     * Vérifie si le jeu est dans un état gagnant pour le joueur spécifié
-     * 
-     * @param joueur Le joueur à vérifier pour un état gagnant.
-     * @return Vrai si le joueur a gagné, Faux sinon.
-     */
-    public boolean inWinState(int joueur) {
+    private void evaluateAvancementPion() {
+        int[] poidAvancement = new int[] {10, 10, 50, 100, 500, 700, 1000, 10000};
+        scoreAvancementRouge = 0;
+        scoreAvancementNoir = 0;
 
-        int pionRougePremiereLigne = 0;
-        int pionNoirPremiereLigne = 0;
-
-        // Compte le nombre de pièces de la première rangée pour chaque joueur
-        for (int row = 0; row < tableau.length; row++) {
-            for (int col = 0; col < tableau[row].length; col++) {
-
-                if (tableau[row][col] == 4)
-                    pionRougePremiereLigne++;
-
-                if (tableau[row][col] == 2)
-                    pionNoirPremiereLigne++;
-
-                // Vérifiez si les pièces du joueur ont atteint la première rangée de
-                // l'adversaire
-                if (joueur == 1) {
-                    if (tableau[row][col] == 4 || tableau[row][col] == 4) {
-                        if (col == 0) {
-                            return true;
-                        }
-                    }
-                } else {
-                    if (tableau[row][col] == 2 || tableau[row][col] == 2) {
-                        if (col == 7) {
-                            return true;
-                        }
-                    }
+        for (int i = 0; i < tableau.length; i++) {
+            int nbPionRouge = 0;
+            int nbPionNoir = 0;
+            for (int j = 0; j < tableau[i].length; j++) {
+                if (tableau[i][j] == pionRouge){
+                    nbPionRouge++;
                 }
+                if (tableau[i][j] == pionNoir){
+                    nbPionNoir++;
+                }
+            }
+            scoreAvancementRouge += poidAvancement[7-i] * nbPionRouge;
+            scoreAvancementNoir += poidAvancement[i] * nbPionNoir;
+        }
+    }
+
+    /**
+     * Vérifie si le jeu est terminer
+     * 
+     * @return Vrai si le jeu est terminé, Faux sinon.
+     */
+    public boolean inTerminalState() {
+
+        //Vérifie si un joueur à attein la base adverse
+        for(int col = 0; col < tableau[0].length; col++){
+            if (tableau[0][col] == pionRouge || tableau[7][col] == pionNoir) {
+                return true;
             }
         }
 
-        // Vérifier si toutes les pièces de l'adversaire ont été éliminées
-        return (joueur == 1 && pionNoirPremiereLigne == 0) || (joueur == 2 && pionRougePremiereLigne == 0);
+        int nbPionRouge = 0;
+        int nbPionNoir = 0;
+        for (int row = 0; row < tableau.length; row++) {
+            for (int col = 0; col < tableau[row].length; col++) {
+                if (tableau[row][col] == pionRouge) nbPionRouge++;
+                if (tableau[row][col] == pionNoir) nbPionNoir++;
+            }
+        }
+
+        // Vérifier si un joueur n'a plus de pion
+        return nbPionRouge == 0 || nbPionNoir == 0;
     }
 
     /**
      * Calcule le nombre de pièces rouges et noires sur le plateau de jeu.
      */
     private void evaluateAvantageMaterial() {
-        nbPionRouge = 0;
-        nbPionNoir = 0;
+        pionRougeVivant = 0;
+        pionNoirVivant = 0;
 
         for (int i = 0; i < tableau.length; i++) {
             for (int j = 0; j < tableau[i].length; j++) {
                 if (tableau[i][j] == 4)
-                    nbPionRouge++;
+                    pionRougeVivant++;
 
                 if (tableau[i][j] == 2)
-                    nbPionNoir++;
+                    pionNoirVivant++;
             }
         }
     }
@@ -154,8 +163,8 @@ public class Evaluation {
      * Calcule le nombre de pièces rouges et noires protégées et ceux en danger sur le plateau de jeu.
      */
     private void evaluatePionSafe() {
-        pionRougeSafe = nbPionRouge;
-        pionNoirSafe = nbPionNoir;
+        pionRougeSafe = pionRougeVivant;
+        pionNoirSafe = pionNoirVivant;
         pionRougeInDanger = 0;
         pionNoirInDanger = 0;
         for (int i = 0; i < tableau.length; i++) {
