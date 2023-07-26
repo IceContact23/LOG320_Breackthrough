@@ -13,7 +13,7 @@ import java.util.Random;
  ***********************************************************************************************/
 public class MinMax {
 
-    private static final int depthMaximum = 5;
+    private static final int depthMaximum = 7;
 
     /**
      * Applique l'algorithme Minimax avec Ã©lagage Alpha-Beta pour Ã©valuer et
@@ -54,8 +54,7 @@ public class MinMax {
             return score;
         }
 
-        List<Mouvement> mouvementLegal = GenerateurMouvement.generateMouvementLegal(tableau.getTableau(),
-                joueurActuel == 1);
+        List<Mouvement> mouvementLegal = GenerateurMouvement.generateMouvementLegal(tableau.getTableau(), joueurActuel == 1);
 
         if (isMaximizingPlayer) {
 

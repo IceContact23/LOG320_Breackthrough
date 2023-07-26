@@ -67,34 +67,34 @@ public class Evaluation {
 
         // Facteurs de poids d'évaluation
         int poidAvancement = 1;
-        int poidPionSafe = 25;
-        int poidPionInDanger = 50;
+        int poidPionSafe = 50;
+        int poidPionInDanger = 10000;
         int poidPionOpen = 0;
         //int poidBlock = 35;
         int poidPionVivant = 5;
-        int poidRatioPionVivant = 10;
+        int poidRatioPionVivant = 50;
         int poidControleCentre = 0;
-        int poidGagneProxi = 10000;
+        int poidGagneProxi = 1000000;
 
         // Calculer le score d'évaluation
         if (joueur == 1) { //Pion rouge
-            evaluation = poidPionVivant  * pionRougeVivant
-                    + poidRatioPionVivant * (pionRougeVivant - pionNoirVivant)
+            evaluation = //poidPionVivant  * pionRougeVivant
+                    //+ poidRatioPionVivant * (pionRougeVivant - pionNoirVivant)
                     + poidAvancement * scoreAvancementRouge
                     + poidPionSafe * pionRougeSafe + poidPionInDanger * pionNoirInDanger
-                    + poidPionOpen * (pionRougeOpen - pionNoirOpen) - poidGagneProxi * gagneProxiNoir;
+                    /*+ poidPionOpen * (pionRougeOpen - pionNoirOpen)*/ - poidGagneProxi * gagneProxiNoir;
         } else { //Pion noir
-            evaluation = poidPionVivant * (pionNoirVivant - pionRougeVivant)
+            evaluation = //poidPionVivant  * pionNoirVivant
+                    + poidRatioPionVivant * (pionNoirVivant - pionRougeVivant)
                     + poidAvancement * scoreAvancementNoir
                     + poidPionSafe * pionNoirSafe + poidPionInDanger * pionRougeInDanger
-                    + poidPionOpen * (pionNoirOpen - pionRougeOpen) - poidGagneProxi * gagneProxiRouge;
+                    /*+ poidPionOpen * (pionNoirOpen - pionRougeOpen)*/ - poidGagneProxi * gagneProxiRouge;
         }
-
         return (joueur == Client.joueur) ? evaluation : -(evaluation);
     }
 
     private void evaluateAvancementPion() {
-        int[] poidAvancement = new int[] {10, 10, 50, 100, 500, 700, 1000, 10000};
+        int[] poidAvancement = new int[] {35, 30, 35, 40, 50, 60, 10000, 0};
         scoreAvancementRouge = 0;
         scoreAvancementNoir = 0;
 
@@ -170,13 +170,19 @@ public class Evaluation {
         for (int i = 0; i < tableau.length; i++) {
             for (int j = 0; j < tableau[i].length; j++) {
                 if (tableau[i][j] == pionNoir && i+1 <= rowLenght-1 && ((j+1 <= colLenght-1  && tableau[i+1][j+1] == pionRouge) || (j-1 >= 0 && tableau[i+1][j-1] == pionRouge))){
-                    pionNoirSafe--;
-                    pionNoirInDanger++;
+                    if(i-1 >= 0 && ((j+1 <= colLenght-1 && tableau[i-1][j+1] == pionNoir)  || (j-1 >= 0 && tableau[i-1][j-1] == pionNoir))){
+                        pionRougeInDanger++;
+                    }else{
+                        pionNoirSafe--;
+                    }
                 }
 
                 if (tableau[i][j] == pionRouge && i-1 >= 0 && ((j+1 <= colLenght-1 && tableau[i-1][j+1] == pionNoir)  || (j-1 >= 0 && tableau[i-1][j-1] == pionNoir))){
-                    pionRougeSafe--;
-                    pionRougeInDanger++;
+                    if(i+1 <= rowLenght-1 && ((j+1 <= colLenght-1  && tableau[i+1][j+1] == pionRouge) || (j-1 >= 0 && tableau[i+1][j-1] == pionRouge))){
+                        pionNoirInDanger++;
+                    }else{
+                        pionRougeSafe--;
+                    }
                 }
             }
         }
@@ -262,14 +268,11 @@ public class Evaluation {
         gagneProxiRouge = 0;
         gagneProxiNoir = 0;
 
-        for (int i = 0; i < tableau.length; i++) {
+        int[] array = new int[] {0,1,6,7};
+        for (int i = 0; i < array.length; i++) {
             for (int j = 0; j < tableau[i].length; j++) {
-                if (tableau[i][j] == 4 && (i == 0 || i == 1))
-                    gagneProxiRouge++;
-
-                if (tableau[i][j] == 2
-                        && (i == tableau.length - 1 || i == tableau.length - 2))
-                    gagneProxiNoir++;
+                if (tableau[i][j] == 4 && (i == 0 || i == 1)) gagneProxiRouge++;
+                if (tableau[i][j] == 2 && (i == 6 || i == 7)) gagneProxiNoir++;
             }
         }
     }

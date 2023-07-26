@@ -86,8 +86,7 @@ public class GenerateurMouvement {
                 return true;
             }
             return false;
-        }else{
-            return false;
         }
+        return false;
     }
 }
