@@ -30,19 +30,15 @@ public class GenerateurMouvement {
     public static List<Mouvement> generateMouvementLegal(int[][] tableau, boolean estJoueurRouge) {
         List<Mouvement> mouvementsLegal = new ArrayList<>();
 
-        int pionPLigne = estJoueurRouge ? 4 : 2;
-        int pionDLigne = estJoueurRouge ? 4 : 2;
+        int pion = estJoueurRouge ? 4 : 2;
 
         for (int i = 0; i < tableau.length; i++) {
             for (int j = 0; j < tableau[i].length; j++) {
                 int jetonActuel = tableau[i][j];
 
-                if (jetonActuel == pionPLigne) {
+                if (jetonActuel == pion) {
 
                     generatepionPLigneMoves(tableau, i, j, mouvementsLegal, estJoueurRouge);
-                } else if (jetonActuel == pionDLigne) {
-
-                    generatepionDLigneMoves(tableau, i, j, mouvementsLegal, estJoueurRouge);
                 }
             }
         }
@@ -61,9 +57,8 @@ public class GenerateurMouvement {
      */
     private static void generatepionPLigneMoves(int[][] tableau, int i, int j, List<Mouvement> mouvementsLegal,
             boolean estJoueurRouge) {
-        int pionPLigne = estJoueurRouge ? 4 : 2;
-        int pionAdversairePLigne = estJoueurRouge ? 2 : 4;
-        int pionAdversaireDLigne = estJoueurRouge ? 2 : 4;
+        int pion = estJoueurRouge ? 4 : 2;
+        int pionAdversaire = estJoueurRouge ? 2 : 4;
 
         int rowDirection = estJoueurRouge ? -1 : 1;
 
@@ -81,12 +76,10 @@ public class GenerateurMouvement {
                 int destinationToken = tableau[newRow][newCol];
                 // Only when the cell is empty he can move up, if there's a pionPLigne or
                 // pionDLigne he can't
-                if (direction[0] == 0
-                        && (destinationToken == pionAdversaireDLigne || destinationToken == pionAdversairePLigne)) {
+                if (direction[0] == 0 && destinationToken == pionAdversaire) {
                     // Do nothing
-                } else if (destinationToken == 0 || destinationToken == pionAdversaireDLigne
-                        || destinationToken == pionAdversairePLigne) {
-                    mouvementsLegal.add(new Mouvement(pionPLigne, new Coordonne(i, j), new Coordonne(newRow, newCol)));
+                } else if (destinationToken == 0 || destinationToken == pionAdversaire) {
+                    mouvementsLegal.add(new Mouvement(pion, new Coordonne(i, j), new Coordonne(newRow, newCol)));
                 }
             }
         }
