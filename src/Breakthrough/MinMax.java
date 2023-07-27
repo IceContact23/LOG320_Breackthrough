@@ -13,7 +13,7 @@ import java.util.Random;
  ***********************************************************************************************/
 public class MinMax {
 
-    private static final int depthMaximum = 7;
+    private static final int depthMaximum = 5;
 
     /**
      * Applique l'algorithme Minimax avec Ã©lagage Alpha-Beta pour Ã©valuer et
