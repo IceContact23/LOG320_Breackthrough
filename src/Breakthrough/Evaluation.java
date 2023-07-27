@@ -30,11 +30,12 @@ public class Evaluation {
     private int controleCentreNoir;
     private int scoreAvancementRouge;
     private int scoreAvancementNoir;
+    private int scoreGroupePionRouge;
+    private int scoreGroupePionNoir;
+    private int trouBaseRouge;
+    private int trouBaseNoir;
     private int pionNoir = 2;
     private int pionRouge = 4;
-    /**
-     * TODO: INVERSER X et Y du tableau
-     * */
 
     /**
      * Construit un objet Evaluation avec le tableau donné.
@@ -59,42 +60,104 @@ public class Evaluation {
 
         evaluateAvantageMaterial();
         evaluatePionOpen();
-        //evaluateBlock();
         evaluateGagneProxi();
-        evaluateControleCentre();
         evaluatePionSafe();
         evaluateAvancementPion();
+        evaluateGroupementPion();
+        evaluateTrouBase();
 
         // Facteurs de poids d'évaluation
         int poidAvancement = 1;
+        int poidTrouBase = -5000;
         int poidPionSafe = 50;
-        int poidPionInDanger = 10000;
+        int poidPionInDanger = -1000;
         int poidPionOpen = 0;
-        //int poidBlock = 35;
         int poidPionVivant = 5;
-        int poidRatioPionVivant = 50;
+        int poidRatioPionVivant = 35;
         int poidControleCentre = 0;
         int poidGagneProxi = 1000000;
 
         // Calculer le score d'évaluation
         if (joueur == 1) { //Pion rouge
-            evaluation = //poidPionVivant  * pionRougeVivant
-                    //+ poidRatioPionVivant * (pionRougeVivant - pionNoirVivant)
-                    + poidAvancement * scoreAvancementRouge
-                    + poidPionSafe * pionRougeSafe + poidPionInDanger * pionNoirInDanger
-                    /*+ poidPionOpen * (pionRougeOpen - pionNoirOpen)*/ - poidGagneProxi * gagneProxiNoir;
+            evaluation = 0;
         } else { //Pion noir
-            evaluation = //poidPionVivant  * pionNoirVivant
-                    + poidRatioPionVivant * (pionNoirVivant - pionRougeVivant)
-                    + poidAvancement * scoreAvancementNoir
-                    + poidPionSafe * pionNoirSafe + poidPionInDanger * pionRougeInDanger
-                    /*+ poidPionOpen * (pionNoirOpen - pionRougeOpen)*/ - poidGagneProxi * gagneProxiRouge;
+            evaluation = 0;
         }
         return (joueur == Client.joueur) ? evaluation : -(evaluation);
     }
 
+    private void evaluateTrouBase() {
+        for (int x = 0; x < tableau[0].length; x++) {
+            if(tableau[rowLenght-1][x] == 0){// Base rouge
+                int nbCaseVide = 0;
+                for (int y = rowLenght-1; y > 4 ; y--) {
+                    if (tableau[y][x] == 0){
+                        nbCaseVide++;
+                    }
+                }
+                trouBaseRouge += nbCaseVide == 3 ? 1 : 0;
+            }
+
+            if(tableau[0][x] == 0){// Base noir
+                int nbCaseVide = 0;
+                for (int y = 0; y < 3 ; y++) {
+                    if (tableau[y][x] == 0){
+                        nbCaseVide++;
+                    }
+                }
+                trouBaseNoir += nbCaseVide == 3 ? 1 : 0;
+            }
+        }
+    }
+
+    private void evaluateGroupementPion() {
+        scoreGroupePionRouge = 0;
+        scoreGroupePionNoir = 0;
+
+        int poidScoreGroupe = 5;
+        int[][] directions = {
+                {1, -1},
+                {1, 0},
+                {1, 1},
+                {0, -1},
+                {0, 1},
+                {-1, -1},
+                {-1, 0},
+                {-1, 1},
+        };
+
+        for (int i = 0; i < tableau.length; i++) {
+            int nbPionNoir = 0;
+            for (int j = 0; j < tableau[i].length; j++) {
+                if (tableau[i][j] == pionRouge){
+                    int nbPionRouge = 0;
+                    for(int[] direction : directions){
+                        int x = direction[1];
+                        int y = direction[0];
+                        if(y >= 0 && y <= rowLenght-1 && x >= 0 && x <= colLenght-1 && tableau[y][x] == pionRouge){
+                            nbPionRouge++;
+                        }
+                    }
+                    scoreGroupePionRouge += poidScoreGroupe * nbPionRouge;
+                }
+
+                if (tableau[i][j] == pionNoir){
+                    for(int[] direction : directions){
+                        int x = direction[1];
+                        int y = direction[0];
+                        if(y >= 0 && y <= rowLenght-1 && x >= 0 && x <= colLenght-1 && tableau[y][x] == pionNoir){
+                            nbPionNoir++;
+                        }
+                    }
+                    scoreGroupePionNoir += poidScoreGroupe * nbPionNoir;
+                }
+            }
+        }
+    }
+
     private void evaluateAvancementPion() {
-        int[] poidAvancement = new int[] {35, 30, 35, 40, 50, 60, 10000, 0};
+        int[] poidAvancement = new int[] {100, 70, 50, 40, 30, 20, 10, 0};
+        //int[] poidAvancement = new int[] {0, 0, 0, 400, 400, 0, 0, 0};
         scoreAvancementRouge = 0;
         scoreAvancementNoir = 0;
 
@@ -273,25 +336,6 @@ public class Evaluation {
             for (int j = 0; j < tableau[i].length; j++) {
                 if (tableau[i][j] == 4 && (i == 0 || i == 1)) gagneProxiRouge++;
                 if (tableau[i][j] == 2 && (i == 6 || i == 7)) gagneProxiNoir++;
-            }
-        }
-    }
-
-    /**
-     * Calcule le contrôle du centre du plateau de jeu par les pièces rouges et
-     * noires.
-     */
-    private void evaluateControleCentre() {
-        controleCentreRouge = 0;
-        controleCentreNoir = 0;
-
-        for (int i = 2; i < 6; i++) {
-            for (int j = 0; j < tableau[i].length; j++) {
-                if (tableau[i][j] == 4)
-                    controleCentreRouge++;
-
-                if (tableau[i][j] == 2)
-                    controleCentreNoir++;
             }
         }
     }
