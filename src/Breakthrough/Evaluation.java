@@ -22,12 +22,6 @@ public class Evaluation {
     private int pionNoirSafe;
     private int pionRougeInDanger;
     private int pionNoirInDanger;
-    private int pionRougeBlock;
-    private int pionNoirBlock;
-    private int gagneProxiRouge;
-    private int gagneProxiNoir;
-    private int controleCentreRouge;
-    private int controleCentreNoir;
     private int scoreAvancementRouge;
     private int scoreAvancementNoir;
     private int scoreGroupePionRouge;
@@ -60,7 +54,6 @@ public class Evaluation {
 
         evaluateAvantageMaterial();
         evaluatePionOpen();
-        evaluateGagneProxi();
         evaluatePionSafe();
         evaluateAvancementPion();
         evaluateGroupementPion();
@@ -70,21 +63,33 @@ public class Evaluation {
         int poidAvancement = 1;
         int poidTrouBase = -5000;
         int poidPionSafe = 50;
-        int poidPionInDanger = -1000;
+        int poidPionInDanger = 100;
         int poidPionOpen = 0;
-        int poidPionVivant = 5;
-        int poidRatioPionVivant = 35;
-        int poidControleCentre = 0;
-        int poidGagneProxi = 1000000;
+        int poidPionVivant = 100;
 
         // Calculer le score d'évaluation
         if (joueur == 1) { //Pion rouge
-            evaluation = 0;
+            evaluation =
+                    poidPionVivant * (pionRougeVivant - pionNoirVivant)
+                        + poidAvancement * (scoreAvancementRouge - scoreAvancementNoir)
+                        + poidPionSafe * pionRougeSafe
+                        + poidPionInDanger * (pionNoirInDanger - pionRougeInDanger);
         } else { //Pion noir
-            evaluation = 0;
+            evaluation =
+                    poidPionVivant * (pionNoirVivant - pionRougeVivant)
+                            + poidAvancement * (scoreAvancementNoir - scoreAvancementRouge)
+                            + poidPionSafe * pionNoirSafe
+                            + poidPionInDanger * (pionRougeInDanger - pionNoirInDanger);;
         }
         return (joueur == Client.joueur) ? evaluation : -(evaluation);
     }
+
+    /**
+     * TODO:
+     * Finir méthode evaluateGroupementPion()
+     * Augmenter depth du jeux
+     * Battre niveau 3
+     * */
 
     private void evaluateTrouBase() {
         for (int x = 0; x < tableau[0].length; x++) {
@@ -156,8 +161,7 @@ public class Evaluation {
     }
 
     private void evaluateAvancementPion() {
-        int[] poidAvancement = new int[] {100, 70, 50, 40, 30, 20, 10, 0};
-        //int[] poidAvancement = new int[] {0, 0, 0, 400, 400, 0, 0, 0};
+        int[] poidAvancement = new int[] {50, 0, 0, 50, 100, 500, 1000, 10000};
         scoreAvancementRouge = 0;
         scoreAvancementNoir = 0;
 
@@ -297,45 +301,6 @@ public class Evaluation {
                         }
                     }
                 }
-            }
-        }
-    }
-
-    /**
-     * Calcule le nombre de pièces rouges et noires bloquées sur le plateau de jeu.
-     */
-    private void evaluateBlock() {
-        pionRougeBlock = 0;
-        pionNoirBlock = 0;
-
-        for (int i = 0; i < tableau.length; i++) {
-            for (int j = 0; j < tableau[i].length; j++) {
-                if (tableau[i][j] == 4) {
-                    if (i != 0 && tableau[i - 1][j] != 0 && tableau[i - 1][j] != 4)
-                        pionRougeBlock++;
-                }
-
-                if (tableau[i][j] == 2) {
-                    if (i != tableau.length - 1 && tableau[i + 1][j] != 0
-                            && tableau[i + 1][j] != 2)
-                        pionNoirBlock++;
-                }
-            }
-        }
-    }
-
-    /**
-     * Calcule le nombre de pièces rouges et noires qui sont proches de gagner.
-     */
-    private void evaluateGagneProxi() {
-        gagneProxiRouge = 0;
-        gagneProxiNoir = 0;
-
-        int[] array = new int[] {0,1,6,7};
-        for (int i = 0; i < array.length; i++) {
-            for (int j = 0; j < tableau[i].length; j++) {
-                if (tableau[i][j] == 4 && (i == 0 || i == 1)) gagneProxiRouge++;
-                if (tableau[i][j] == 2 && (i == 6 || i == 7)) gagneProxiNoir++;
             }
         }
     }
