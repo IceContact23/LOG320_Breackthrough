@@ -65,9 +65,9 @@ public class Tableau {
 
         Coordonne from = move.getFrom();
         Coordonne to = move.getTo();
-        int pion = newTableau[from.getX()][from.getY()];
-        newTableau[from.getX()][from.getY()] = 0;
-        newTableau[to.getX()][to.getY()] = pion;
+        int pion = newTableau[from.getY()][from.getX()];
+        newTableau[from.getY()][from.getX()] = 0;
+        newTableau[to.getY()][to.getX()] = pion;
 
         return new Tableau(newTableau);
     }
