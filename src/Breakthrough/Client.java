@@ -20,7 +20,7 @@ public class Client {
         boolean open = true;
         try {
             MyClient = new Socket(InetAddress.getLocalHost(), 8888);
-            //1MyClient = new Socket(args[0], Integer.parseInt(args[1]));
+            //MyClient = new Socket(args[0], Integer.parseInt(args[1]));
 
             input    = new BufferedInputStream(MyClient.getInputStream());
             output   = new BufferedOutputStream(MyClient.getOutputStream());

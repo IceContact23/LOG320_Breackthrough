@@ -16,8 +16,6 @@ public class Evaluation {
     int colLenght;
     private int pionRougeVivant;
     private int pionNoirVivant;
-    private int pionRougeOpen;
-    private int pionNoirOpen;
     private int pionRougeSafe;
     private int pionNoirSafe;
     private int pionRougeInDanger;
@@ -26,8 +24,6 @@ public class Evaluation {
     private int scoreAvancementNoir;
     private int scoreGroupePionRouge = 0;
     private int scoreGroupePionNoir = 0;
-    private int trouBaseRouge;
-    private int trouBaseNoir;
     private int pionNoir = 2;
     private int pionRouge = 4;
 
@@ -49,7 +45,6 @@ public class Evaluation {
      * @return Le score d'évaluation pour le joueur spécifié.
      */
     public double evaluate(int joueur) {
-
         double evaluation;
 
         evaluateAvantageMaterial();
@@ -61,11 +56,9 @@ public class Evaluation {
         // Facteurs de poids d'évaluation
         double poidAvancement = 1;
         int poidGroupement = 1;
-        int poidTrouBase = -5000;
-        int poidPionSafe = 50;
-        int poidPionInDanger = 100;
-        int poidPionOpen = 0;
-        int poidPionVivant = 150;
+        int poidPionSafe = 100;
+        int poidPionInDanger = 150;
+        int poidPionVivant = 200;
 
         // Calculer le score d'évaluation
         if (joueur == 1) { //Pion rouge
@@ -84,38 +77,6 @@ public class Evaluation {
                             + poidPionInDanger * (pionRougeInDanger - pionNoirInDanger);;
         }
         return (joueur == Client.joueur) ? evaluation : -(evaluation);
-    }
-
-    /**
-     * TODO:
-     * Débuguer: Noir plus lent que rouge.
-     * Débuguer: Pion défend pas quand pion ennemi proche de gagner.
-     * Optimiser valeur évalutation
-     * Vérifier sur ordinateur de l'école
-     **/
-
-    private void evaluateTrouBase() {
-        for (int x = 0; x < tableau[0].length; x++) {
-            if(tableau[rowLenght-1][x] == 0){// Base rouge
-                int nbCaseVide = 0;
-                for (int y = rowLenght-1; y > 4 ; y--) {
-                    if (tableau[y][x] == 0){
-                        nbCaseVide++;
-                    }
-                }
-                trouBaseRouge += nbCaseVide == 3 ? 1 : 0;
-            }
-
-            if(tableau[0][x] == 0){// Base noir
-                int nbCaseVide = 0;
-                for (int y = 0; y < 3 ; y++) {
-                    if (tableau[y][x] == 0){
-                        nbCaseVide++;
-                    }
-                }
-                trouBaseNoir += nbCaseVide == 3 ? 1 : 0;
-            }
-        }
     }
 
     private void evaluateGroupementPion(int couleur) {
@@ -146,25 +107,12 @@ public class Evaluation {
                         scoreGroupePionNoir += couleur == pionNoir ? poidScoreGroupe[i] * nbPion : 0;
                     }
                 }
-
-//                if (tableau[i][j] == pionNoir){
-//                    int nbPionNoir = 0;
-//                    for(int[] direction : directions){
-//                        int x = direction[1] + j;
-//                        int y = direction[0] + i;
-//                        if(y >= 0 && y <= rowLenght-1 && x >= 0 && x <= colLenght-1){
-//                            caseToSkip[x][y] = true;
-//                            nbPionNoir += tableau[y][x] == pionNoir ? 1 : 0;
-//                        }
-//                    }
-//                    scoreGroupePionNoir += poidScoreGroupe * nbPionNoir;
-//                }
             }
         }
     }
 
     private void evaluateAvancementPion() {
-        int[] poidAvancement = new int[] {50, 0, 0, 77, 777, 7777, 77777, 7777777};
+        int[] poidAvancement = new int[] {50, 0, 0, 50, 100, 500, 77777, 7777777};
         scoreAvancementRouge = 0;
         scoreAvancementNoir = 0;
 
@@ -252,56 +200,6 @@ public class Evaluation {
                         pionNoirInDanger++;
                     }else{
                         pionRougeSafe--;
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Calcule la sécurité des poussoirs rouges et noirs sur le plateau de jeu.
-     */
-    private void evaluatePionOpen() {
-        pionRougeOpen = 0;
-        pionNoirOpen = 0;
-
-        //Pion rouge
-        for (int i = 2; i <= 4; i++) {
-            for (int j = 0; j < tableau[i].length; j++) {
-                if(tableau[i][j] == pionRouge){
-                    pionRougeOpen++;
-                    boolean safe = true;
-
-                    if (i-1 >= 0 && ((j+1 <= colLenght-1 && tableau[i-1][j+1] == pionNoir)  || (j-1 >= 0 && tableau[i-1][j-1] == pionNoir))){
-                        pionRougeOpen--;
-                        safe = false;
-                    }
-                    for(int saut = i-2; saut >= 0 && safe; saut= saut-2){
-                        if(saut-1 >= 0 && (tableau[saut-1][j] == pionNoir || (j+1 <= colLenght-1 && tableau[saut-1][j+1] == pionNoir)  || (j-1 >= 0 && tableau[saut-1][j-1] == pionNoir))){
-                            pionRougeOpen--;
-                            safe = false;
-                        }
-                    }
-                }
-            }
-        }
-
-        //Pion noir
-        for (int i = 3; i <= 5; i++) {
-            for (int j = 0; j < tableau[i].length; j++) {
-                if(tableau[i][j] == pionNoir){
-                    pionNoirOpen++;
-                    boolean safe = true;
-
-                    if (i+1 <= rowLenght-1 && ((j+1 <= colLenght-1 && tableau[i+1][j+1] == pionRouge)  || (j-1 >= 0 && tableau[i+1][j-1] == pionRouge))){
-                        pionNoirOpen--;
-                        safe = false;
-                    }
-                    for(int saut = i+2; saut <= rowLenght-1 && safe; saut= saut+2){
-                        if(saut+1 <= rowLenght-1 && (tableau[saut+1][j] == pionRouge || (j+1 <= colLenght-1 && tableau[saut+1][j+1] == pionRouge)  || (j-1 >= 0 && tableau[saut+1][j-1] == pionRouge))){
-                            pionNoirOpen--;
-                            safe = false;
-                        }
                     }
                 }
             }
