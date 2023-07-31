@@ -50,8 +50,7 @@ public class MinMax {
         }
 
         if (depth == depthMaximum || fonctionEvaluation.inTerminalState()) {
-            double score = fonctionEvaluation.evaluate(joueurActuel);
-            return score;
+            return fonctionEvaluation.evaluate(joueurActuel);
         }
 
         List<Mouvement> mouvementLegal = GenerateurMouvement.generateMouvementLegal(tableau.getTableau(), joueurActuel == 1);

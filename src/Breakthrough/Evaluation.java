@@ -53,12 +53,10 @@ public class Evaluation {
         double evaluation;
 
         evaluateAvantageMaterial();
-        evaluatePionOpen();
         evaluatePionSafe();
         evaluateAvancementPion();
         evaluateGroupementPion(4); //Pion rouge
         evaluateGroupementPion(2); //Pion noir
-        //evaluateTrouBase();
 
         // Facteurs de poids d'évaluation
         double poidAvancement = 1;
