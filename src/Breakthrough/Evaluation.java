@@ -24,8 +24,8 @@ public class Evaluation {
     private int pionNoirInDanger;
     private int scoreAvancementRouge;
     private int scoreAvancementNoir;
-    private int scoreGroupePionRouge;
-    private int scoreGroupePionNoir;
+    private int scoreGroupePionRouge = 0;
+    private int scoreGroupePionNoir = 0;
     private int trouBaseRouge;
     private int trouBaseNoir;
     private int pionNoir = 2;
@@ -56,11 +56,13 @@ public class Evaluation {
         evaluatePionOpen();
         evaluatePionSafe();
         evaluateAvancementPion();
-        evaluateGroupementPion();
+        evaluateGroupementPion(4); //Pion rouge
+        evaluateGroupementPion(2); //Pion noir
         evaluateTrouBase();
 
         // Facteurs de poids d'évaluation
         int poidAvancement = 1;
+        int poidGroupement = 1;
         int poidTrouBase = -5000;
         int poidPionSafe = 50;
         int poidPionInDanger = 100;
@@ -72,12 +74,14 @@ public class Evaluation {
             evaluation =
                     poidPionVivant * (pionRougeVivant - pionNoirVivant)
                         + poidAvancement * (scoreAvancementRouge - scoreAvancementNoir)
+                        + poidGroupement * (scoreGroupePionRouge - scoreGroupePionNoir)
                         + poidPionSafe * pionRougeSafe
                         + poidPionInDanger * (pionNoirInDanger - pionRougeInDanger);
         } else { //Pion noir
             evaluation =
                     poidPionVivant * (pionNoirVivant - pionRougeVivant)
                             + poidAvancement * (scoreAvancementNoir - scoreAvancementRouge)
+                            + poidGroupement * (scoreGroupePionNoir - scoreGroupePionRouge)
                             + poidPionSafe * pionNoirSafe
                             + poidPionInDanger * (pionRougeInDanger - pionNoirInDanger);;
         }
@@ -86,10 +90,11 @@ public class Evaluation {
 
     /**
      * TODO:
-     * Finir méthode evaluateGroupementPion()
-     * Augmenter depth du jeux
-     * Battre niveau 3
-     * */
+     * Débuguer: Noir plus lent que rouge.
+     * Débuguer: Pion défend pas quand pion ennemi proche de gagner.
+     * Optimiser valeur évalutation
+     * Vérifier sur ordinateur de l'école
+     **/
 
     private void evaluateTrouBase() {
         for (int x = 0; x < tableau[0].length; x++) {
@@ -115,47 +120,47 @@ public class Evaluation {
         }
     }
 
-    private void evaluateGroupementPion() {
-        scoreGroupePionRouge = 0;
-        scoreGroupePionNoir = 0;
+    private void evaluateGroupementPion(int couleur) {
+        int[] poidScoreGroupe = {50, 50, 50, 50, 50, 50, 50, 50};
 
-        int poidScoreGroupe = 5;
+         boolean[][] caseToSkip = new boolean[rowLenght][colLenght];
         int[][] directions = {
-                {1, -1},
-                {1, 0},
-                {1, 1},
-                {0, -1},
                 {0, 1},
-                {-1, -1},
-                {-1, 0},
-                {-1, 1},
+                {1, 0},
+                {1, 1}
         };
 
         for (int i = 0; i < tableau.length; i++) {
-            int nbPionNoir = 0;
             for (int j = 0; j < tableau[i].length; j++) {
-                if (tableau[i][j] == pionRouge){
-                    int nbPionRouge = 0;
+                if(caseToSkip[i][j]) continue;
+                else if (tableau[i][j] == couleur){
+                    int nbPion = 0;
                     for(int[] direction : directions){
-                        int x = direction[1];
-                        int y = direction[0];
-                        if(y >= 0 && y <= rowLenght-1 && x >= 0 && x <= colLenght-1 && tableau[y][x] == pionRouge){
-                            nbPionRouge++;
+                        int x = direction[1] + j;
+                        int y = direction[0] + i;
+                        if(y >= 0 && y <= rowLenght-1 && x >= 0 && x <= colLenght-1){
+                            caseToSkip[y][x] = true;
+                            nbPion += tableau[y][x] == couleur ? 1 : 0;
                         }
                     }
-                    scoreGroupePionRouge += poidScoreGroupe * nbPionRouge;
+                    if(nbPion > 1){
+                        scoreGroupePionRouge += couleur == pionRouge ? poidScoreGroupe[7-i] * nbPion : 0;
+                        scoreGroupePionNoir += couleur == pionNoir ? poidScoreGroupe[i] * nbPion : 0;
+                    }
                 }
 
-                if (tableau[i][j] == pionNoir){
-                    for(int[] direction : directions){
-                        int x = direction[1];
-                        int y = direction[0];
-                        if(y >= 0 && y <= rowLenght-1 && x >= 0 && x <= colLenght-1 && tableau[y][x] == pionNoir){
-                            nbPionNoir++;
-                        }
-                    }
-                    scoreGroupePionNoir += poidScoreGroupe * nbPionNoir;
-                }
+//                if (tableau[i][j] == pionNoir){
+//                    int nbPionNoir = 0;
+//                    for(int[] direction : directions){
+//                        int x = direction[1] + j;
+//                        int y = direction[0] + i;
+//                        if(y >= 0 && y <= rowLenght-1 && x >= 0 && x <= colLenght-1){
+//                            caseToSkip[x][y] = true;
+//                            nbPionNoir += tableau[y][x] == pionNoir ? 1 : 0;
+//                        }
+//                    }
+//                    scoreGroupePionNoir += poidScoreGroupe * nbPionNoir;
+//                }
             }
         }
     }

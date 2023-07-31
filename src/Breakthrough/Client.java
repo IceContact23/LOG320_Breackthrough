@@ -19,7 +19,8 @@ public class Client {
         int[][] board = new int[8][8];
 
         try {
-            MyClient = new Socket("localhost", 8888);
+            MyClient = new Socket(InetAddress.getLocalHost(), 8888);
+            //1MyClient = new Socket(args[0], Integer.parseInt(args[1]));
 
             input    = new BufferedInputStream(MyClient.getInputStream());
             output   = new BufferedOutputStream(MyClient.getOutputStream());
