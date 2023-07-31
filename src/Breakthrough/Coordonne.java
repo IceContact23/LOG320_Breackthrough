@@ -54,19 +54,28 @@ public class Coordonne {
      * @return La représentation en caractères de l'index de colonne.
      */
     public String translateXToChar() {
-        return switch (this.x) {
-            case 0 -> "A";
-            case 1 -> "B";
-            case 2 -> "C";
-            case 3 -> "D";
-            case 4 -> "E";
-            case 5 -> "F";
-            case 6 -> "G";
-            case 7 -> "H";
-            default -> "";
-        };
+        switch (this.x) {
+            case 0:
+                return "A";
+            case 1:
+                return "B";
+            case 2:
+                return "C";
+            case 3:
+                return "D";
+            case 4:
+                return "E";
+            case 5:
+                return "F";
+            case 6:
+                return "G";
+            case 7:
+                return "H";
+            default:
+                return "";
+        }
     }
-
+    
     /**
      * Traduit la coordonnée de ligne basée sur des caractères en la valeur entière
      * correspondante.
@@ -75,18 +84,28 @@ public class Coordonne {
      * @return L'index de ligne correspondant.
      */
     public int translateCharToX(char x) {
-        return switch (x) {
-            case 'A' -> 0;
-            case 'B' -> 1;
-            case 'C' -> 2;
-            case 'D' -> 3;
-            case 'E' -> 4;
-            case 'F' -> 5;
-            case 'G' -> 6;
-            case 'H' -> 7;
-            default -> -1;
-        };
+        switch (x) {
+            case 'A':
+                return 0;
+            case 'B':
+                return 1;
+            case 'C':
+                return 2;
+            case 'D':
+                return 3;
+            case 'E':
+                return 4;
+            case 'F':
+                return 5;
+            case 'G':
+                return 6;
+            case 'H':
+                return 7;
+            default:
+                return -1;
+        }
     }
+    
 
     /**
      * Dans un tableau int 2D, la coordonnée (0,0) est dans le coin supérieur
