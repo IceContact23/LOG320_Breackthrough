@@ -17,7 +17,7 @@ public class Client {
         BufferedInputStream input;
         BufferedOutputStream output;
         int[][] board = new int[8][8];
-
+        boolean open = true;
         try {
             MyClient = new Socket(InetAddress.getLocalHost(), 8888);
             //1MyClient = new Socket(args[0], Integer.parseInt(args[1]));
@@ -25,7 +25,7 @@ public class Client {
             input    = new BufferedInputStream(MyClient.getInputStream());
             output   = new BufferedOutputStream(MyClient.getOutputStream());
             BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
-            while(true){
+            while(open){
                 char cmd = 0;
 
                 cmd = (char)input.read();
@@ -184,7 +184,11 @@ public class Client {
                     move = console.readLine();
                     output.write(move.getBytes(),0,move.length());
                     output.flush();
-
+                    output.close();
+                    input.close();
+                    open = false;
+                    System.out.close();
+                    System.in.close();
                 }
             }
         }
