@@ -13,7 +13,7 @@ import java.util.Random;
  ***********************************************************************************************/
 public class MinMax {
 
-    private static final int depthMaximum = 6;
+    private static final int depthMaximum = 5;
 
     /**
      * Applique l'algorithme Minimax avec Ã©lagage Alpha-Beta pour Ã©valuer et
@@ -132,8 +132,7 @@ public class MinMax {
 
             for (Mouvement mouvement : mouvementLegal) {
                 Tableau newTableau = tableau.applyMove(mouvement);
-                double scoreActuel = AlphaBeta(newTableau, depth, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY,
-                        false, tempsFin);
+                double scoreActuel = AlphaBeta(newTableau, depth, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, false, tempsFin);
 
                 if (scoreActuel > meilleurScore) {
                     meilleurMouvement.clear();

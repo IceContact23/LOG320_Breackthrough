@@ -58,16 +58,16 @@ public class Evaluation {
         evaluateAvancementPion();
         evaluateGroupementPion(4); //Pion rouge
         evaluateGroupementPion(2); //Pion noir
-        evaluateTrouBase();
+        //evaluateTrouBase();
 
         // Facteurs de poids d'évaluation
-        int poidAvancement = 1;
+        double poidAvancement = 1;
         int poidGroupement = 1;
         int poidTrouBase = -5000;
         int poidPionSafe = 50;
         int poidPionInDanger = 100;
         int poidPionOpen = 0;
-        int poidPionVivant = 100;
+        int poidPionVivant = 150;
 
         // Calculer le score d'évaluation
         if (joueur == 1) { //Pion rouge
@@ -121,7 +121,7 @@ public class Evaluation {
     }
 
     private void evaluateGroupementPion(int couleur) {
-        int[] poidScoreGroupe = {50, 50, 50, 50, 50, 50, 50, 50};
+        int[] poidScoreGroupe = {0, 0, 25, 25, 35, 35, 50, 50};
 
          boolean[][] caseToSkip = new boolean[rowLenght][colLenght];
         int[][] directions = {
@@ -166,7 +166,7 @@ public class Evaluation {
     }
 
     private void evaluateAvancementPion() {
-        int[] poidAvancement = new int[] {50, 0, 0, 50, 100, 500, 1000, 10000};
+        int[] poidAvancement = new int[] {50, 0, 0, 77, 777, 7777, 77777, 7777777};
         scoreAvancementRouge = 0;
         scoreAvancementNoir = 0;
 
